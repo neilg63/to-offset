@@ -5,5 +5,6 @@ repository = "https://github.com/neilg63/to-offset"
 version = "0.0.1"
 edition = "2021"
 categories = ["data-processing", "stream-processing", "text-manipulation"]
+license = "GPL-2.0-or-later WITH Bison-exception-2.2"
 
 [dependencies]
