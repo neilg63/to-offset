@@ -2,44 +2,55 @@
 [![crates.io](https://img.shields.io/crates/v/to-offset.svg)](https://crates.io/crates/to-offset)
 [![docs.rs](https://docs.rs/to-offset/badge.svg)](https://docs.rs/to-offset)
 
-# ToOffset and FromOfsset
+# ToOffset and FromOffset
 
-## Cast offsets, as any of the core signed and unsigned integer types, to valid unsigned indices with a defined length
+## Convert Signed and Unsigned Integers to Valid Indices
 
-This crate adds provides two simple traits that make it easier to work a range of common signed and unsigned integer types or to constrain generic parameters to integer type that may be safely cast to usize with the following rules:
+This crate introduces two traits to simplify working with a range of integer types or to constrain generic parameters for safe casting to `usize`, following these rules:
 
-Negative offsets work backwards from the projected length, e.g -2 with an array length of 10 would refer the last but one index of 8, the last being 9.
+- **Negative Offsets**: Count backwards from the given length. For example, `-2` with an array length of 10 refers to index `8` (the last but one).
+- **Overflow/Underflow**:
+  - If the offset underflows, it returns `0`.
+  - If it overflows, it returns the last index for arrays or the length for integer types.
 
-- If the offset underflows, it will return 0.
-- If the offset overflows, it will return the last index with arrays and the length with integer types.
+### ToOffset
 
-### ToOfset to_offset(length: usize)
-
-The `to_offset(length: usize)` method will work with i32, i64, u8, u32, u64 and usize. The length parameters is the maximum offset, compatible with slice ranges where the rightmost value is the next index.
+The `to_offset(length: usize)` method is implemented for `i32`, `i64`, `u8`, `u32`, `u64`, and `usize`. Here, `length` represents the maximum offset, akin to the end of a slice range.
 
 ```rust
 let sample_array = [1, 2, 3, 4, 5, 6];
+
+// Example with negative offset
 let relative_index_1 = -2;
 let result_1 = relative_index_1.to_offset(sample_array.len());
-// result_1 is the penultimate index
+// result_1 is 4, the index of the penultimate element
 
+// Example with overflow
 let relative_index_2 = 100;
 let result_2 = relative_index_2.to_offset(sample_array.len());
-// result_2 is 6, i.e. the array size
+// result_2 is 6, the length of the array
 
+// Example with underflow
 let relative_index_3 = -100;
-let result_2 = relative_index_3.to_offset(sample_array.len());
-// result_3 is 0, i.e. the first index
-
+let result_3 = relative_index_3.to_offset(sample_array.len());
+// result_3 is 0, the first index
 ```
 
-### FromOfset from_offset(offset: T) -> Option<&T>
+### FromOffset
 
-This method works with arrays or vectors. Unlike get, it accepts all integers types that implement ToOffset.
+The `from_offset(offset: T) -> Option<&T>` method works with arrays or vectors, accepting any integer type that implements `ToOffset`.
 
 ```rust
 let sample_array = [1, 2, 3, 4, 5, 6];
 
+// Accessing the penultimate element
 let penultimate_element = sample_array.from_offset(-2);
-// equauls 5, the last but one array value
+// equals Some(&5), reference to the last but one element
+
+// Negative offset beyond bounds
+let end_minus_10 = sample_array.from_offset(-10);
+// equals Some(1), the first element as there are only 6 and it would otherwise underflow
+
+let start_plus_10 = sample_array.from_offset(10);
+// equals Some(6), the last element as there are only 6
 ```
