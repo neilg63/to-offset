@@ -1,9 +1,8 @@
-/// Trait to allow all main signed and unsigne integer 
+/// Trait to allow the main signed and unsigned integer types
 /// where negative values are treated as offsets from the end, defined by length
-/// -1 == length -1
-/// 0 == start
-/// 1 == second position
-/// should values fall outside the range
+/// -1 == length -1, 0 == start, 1 == second position
+/// If the offset underflows, it returns 0.
+/// If it overflows, it returns the last index for arrays or the length for integer types.
 pub trait ToOffset where Self:PartialOrd {
     fn to_offset(self, length: usize) -> usize;
 }
@@ -123,7 +122,7 @@ mod tests {
 
         let twentieth_from_the_end = integer_array.from_offset(-20);
 
-        // will the first [0] element as it cannot extend before the start
+        // should be the first [0] element with a vakue of 1 as it cannot extend before the start
         assert_eq!(twentieth_from_the_end.unwrap().to_owned(), 1); 
 
     }
