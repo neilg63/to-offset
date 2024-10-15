@@ -4,7 +4,7 @@
 
 # ToOffset and FromOffset
 
-## Convert Signed and Unsigned Integers to Valid Indices
+## Convert signed and unsigned integers to valid indices
 
 This crate introduces two traits to simplify working with a range of integer types or to constrain generic parameters for safe casting to `usize`, following these rules:
 
